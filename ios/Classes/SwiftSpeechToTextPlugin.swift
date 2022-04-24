@@ -277,6 +277,10 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
     private func stopSpeech( _ result: @escaping FlutterResult) {
         if ( !listening ) {
             print("stopSpeech-01")
+            if let sound = successSound {
+                sound.seek(to: .zero,completionHandler: {_ in
+                sound.play()})          
+            }
             sendBoolResult( false, result );
             return
         }
