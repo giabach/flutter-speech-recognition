@@ -329,9 +329,9 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             os_log("Error removing trap: %{PUBLIC}@", log: pluginLog, type: .error, error.localizedDescription)
         }
         do {
-            if let rememberedAudioCategory = rememberedAudioCategory, let rememberedAudioCategoryOptions = rememberedAudioCategoryOptions {
-                try self.audioSession.setCategory(rememberedAudioCategory,options: rememberedAudioCategoryOptions)
-            }
+//             if let rememberedAudioCategory = rememberedAudioCategory, let rememberedAudioCategoryOptions = rememberedAudioCategoryOptions {
+//                 try self.audioSession.setCategory(rememberedAudioCategory,options: rememberedAudioCategoryOptions)
+//             }
         }
         catch {
             os_log("Error stopping listen: %{PUBLIC}@", log: pluginLog, type: .error, error.localizedDescription)
