@@ -264,6 +264,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
         self.currentTask?.finish()
         if let sound = successSound {
             self.onPlayEnd = {() -> Void in
+                print("stop-sound-end.")
                 self.stopCurrentListen( )
                 self.sendBoolResult( true, result )
                 return
