@@ -259,7 +259,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
         if ( !listening ) {
             if let sound = successSound {
                 onPlayEnd = {() -> Void in
-                    sendBoolResult( false, result );
+                    self.sendBoolResult( false, result );
                     return
                 }
                 sound.play()
