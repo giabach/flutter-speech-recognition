@@ -288,9 +288,9 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
 //                 self.sendBoolResult( true, result )
 //                 return
 //             }
-            sound.play()
             self.stopCurrentListen( )
             self.sendBoolResult( true, result )
+            sound.play()
         }
         else {
             stopCurrentListen( )
