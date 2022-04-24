@@ -262,7 +262,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
                     self.sendBoolResult( false, result );
                     return
                 }
-                sound.play()
+                sound.play(atTime:0)
             }
             return
         }
@@ -274,7 +274,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
                 self.sendBoolResult( true, result )
                 return
             }
-            sound.play()
+            sound.play(atTime:0)
         }
         else {
             stopCurrentListen( )
