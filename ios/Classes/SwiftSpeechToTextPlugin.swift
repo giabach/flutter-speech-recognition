@@ -282,7 +282,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
         }
 //         stopAllPlayers()
         self.currentTask?.finish()
-        if let sound = listeningSound {
+        if let sound = successSound {
 //             self.onPlayEnd = {() -> Void in
 //                 print("stop-sound-end.")
 //                 self.stopCurrentListen( )
@@ -298,7 +298,8 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             }
             catch {
             }
-            sound.play(atTime:0)
+            sound.seek(to: .zero)
+            sound.play()
         }
         else {
             print("stopSpeech-03")
@@ -336,7 +337,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
     
     private func stopCurrentListen( ) {
         self.currentRequest?.endAudio()
-        stopAllPlayers()
+//         stopAllPlayers()
         do {
             try trap {
                 self.audioEngine.stop()
