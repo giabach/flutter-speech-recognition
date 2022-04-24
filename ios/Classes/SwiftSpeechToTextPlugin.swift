@@ -292,6 +292,12 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             print("stopSpeech-02")
             self.stopCurrentListen( )
             self.sendBoolResult( true, result )
+            do {
+                try self.audioSession.setCategory(.playAndRecord)
+                try self.audioSession.overrideOutputAudioPort(.speaker)
+            }
+            catch {
+            }
             sound.play()
         }
         else {
