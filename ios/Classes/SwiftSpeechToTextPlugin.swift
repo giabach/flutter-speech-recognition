@@ -276,6 +276,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
     
     private func stopSpeech( _ result: @escaping FlutterResult) {
         if ( !listening ) {
+            print("stopSpeech-01")
             sendBoolResult( false, result );
             return
         }
@@ -288,11 +289,13 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
 //                 self.sendBoolResult( true, result )
 //                 return
 //             }
+            print("stopSpeech-02")
             self.stopCurrentListen( )
             self.sendBoolResult( true, result )
             sound.play()
         }
         else {
+            print("stopSpeech-03")
             stopCurrentListen( )
             sendBoolResult( true, result );
         }
