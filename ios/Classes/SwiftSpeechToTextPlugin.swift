@@ -329,14 +329,14 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
     }
     
     private func stopAllPlayers() {
-        cancelSound?.stop()
+//         cancelSound?.stop()
 //         successSound?.stop()
         listeningSound?.stop()
     }
     
     private func stopCurrentListen( ) {
         self.currentRequest?.endAudio()
-//         stopAllPlayers()
+        stopAllPlayers()
         do {
             try trap {
                 self.audioEngine.stop()
