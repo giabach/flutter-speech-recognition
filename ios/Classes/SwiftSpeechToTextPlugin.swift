@@ -298,8 +298,11 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             }
             catch {
             }
-            sound.seek(to: .zero)
-            sound.play()
+//             sound.seek(to: .zero)
+            sound.seek(to: .zero,completionHandler: {_ in
+                sound.play()
+            })
+            
         }
         else {
             print("stopSpeech-03")
