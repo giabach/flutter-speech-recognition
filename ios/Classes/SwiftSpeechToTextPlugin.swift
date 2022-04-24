@@ -321,7 +321,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
     
     private func stopAllPlayers() {
         cancelSound?.stop()
-        successSound?.stop()
+//         successSound?.stop()
         listeningSound?.stop()
     }
     
