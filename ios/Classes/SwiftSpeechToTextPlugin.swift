@@ -298,7 +298,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             }
             catch {
             }
-            sound.play()
+            sound.play(atTime:0)
         }
         else {
             print("stopSpeech-03")
