@@ -372,7 +372,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             try self.audioSession.setCategory(AVAudioSession.Category.playAndRecord, options: [.defaultToSpeaker,.allowBluetooth,.allowBluetoothA2DP])
             try self.audioSession.overrideOutputAudioPort(.speaker)
             
-            print('testtest')
+            print("testtest")
             
             //            try self.audioSession.setMode(AVAudioSession.Mode.measurement)
             if ( sampleRate > 0 ) {
