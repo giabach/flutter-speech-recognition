@@ -380,7 +380,8 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             }
             try self.audioSession.setMode(AVAudioSession.Mode.default)
             try self.audioSession.setActive(true, options: .notifyOthersOnDeactivation)
-            if let sound = listeningSound {
+//             if let sound = listeningSound {
+            if let sound = successSound {
                 self.onPlayEnd = {()->Void in
                     if ( !self.failedListen ) {
                         self.listening = true
