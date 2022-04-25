@@ -256,14 +256,14 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
     }
     
     private func stopSpeech( _ result: @escaping FlutterResult) {
-        if ( !listening ) {
-            sendBoolResult( false, result );
-            return
-        }
         stopAllPlayers()
-        self.currentTask?.finish()
         if let sound = successSound {
-            onPlayEnd = {() -> Void in
+            self.onPlayEnd = {() -> Void in
+                if ( !listening ) {
+                    sendBoolResult( false, result );
+                    return
+                }
+                self.currentTask?.finish()
                 self.stopCurrentListen( )
                 self.sendBoolResult( true, result )
                 return
@@ -271,20 +271,21 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             sound.play()
         }
         else {
+            self.currentTask?.finish()
             stopCurrentListen( )
             sendBoolResult( true, result );
         }
     }
     
     private func cancelSpeech( _ result: @escaping FlutterResult) {
-        if ( !listening ) {
-            sendBoolResult( false, result );
-            return
-        }
         stopAllPlayers()
-        self.currentTask?.cancel()
         if let sound = cancelSound {
-            onPlayEnd = {() -> Void in
+            self.onPlayEnd = {() -> Void in
+                if ( !listening ) {
+                    sendBoolResult( false, result );
+                    return
+                }
+                self.currentTask?.cancel()
                 self.stopCurrentListen( )
                 self.sendBoolResult( true, result )
                 return
@@ -292,6 +293,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             sound.play()
         }
         else {
+            self.currentTask?.cancel()
             stopCurrentListen( )
             sendBoolResult( true, result );
         }
