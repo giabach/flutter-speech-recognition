@@ -263,6 +263,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
     
     private func stopSpeech( _ result: @escaping FlutterResult) {
         if ( !listening ) {
+            print("stopSpeech-01")
             if let sound = successSound {
                 sound.seek(to: .zero,completionHandler: {_ in
                     sound.play()})
@@ -273,12 +274,14 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
         stopAllPlayers()
         self.currentTask?.finish()
         if let sound = successSound {
+            print("stopSpeech-02")
             sound.seek(to: .zero,completionHandler: {_ in
                     sound.play()})
             self.stopCurrentListen( )
             self.sendBoolResult( true, result )
         }
         else {
+            print("stopSpeech-03")
             stopCurrentListen( )
             sendBoolResult( true, result );
         }
@@ -286,12 +289,14 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
     
     private func cancelSpeech( _ result: @escaping FlutterResult) {
         if ( !listening ) {
+            print("cancelSpeech-01")
             sendBoolResult( false, result );
             return
         }
         stopAllPlayers()
         self.currentTask?.cancel()
         if let sound = cancelSound {
+            print("cancelSpeech-02")
             onPlayEnd = {() -> Void in
                 self.stopCurrentListen( )
                 self.sendBoolResult( true, result )
@@ -300,6 +305,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             sound.play()
         }
         else {
+            print("cancelSpeech-03")
             stopCurrentListen( )
             sendBoolResult( true, result );
         }
@@ -381,7 +387,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             rememberedAudioCategory = self.audioSession.category
             rememberedAudioCategoryOptions = self.audioSession.categoryOptions
             try self.audioSession.setCategory(AVAudioSession.Category.playAndRecord, options: [.defaultToSpeaker,.allowBluetooth,.allowBluetoothA2DP])
-            try self.audioSession.overrideOutputAudioPort(.speaker)
+//             try self.audioSession.overrideOutputAudioPort(.speaker)
 
             //            try self.audioSession.setMode(AVAudioSession.Mode.measurement)
             if ( sampleRate > 0 ) {
