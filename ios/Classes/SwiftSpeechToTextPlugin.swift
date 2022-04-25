@@ -71,15 +71,9 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
     private var recognizer: SFSpeechRecognizer?
     private var currentRequest: SFSpeechAudioBufferRecognitionRequest?
     private var currentTask: SFSpeechRecognitionTask?
-    
-//     private var listeningSound: AVAudioPlayer?
-//     private var successSound: AVAudioPlayer?
-//     private var cancelSound: AVAudioPlayer?
-  
-    private var listeningSound: AVPlayer?
-    private var successSound: AVPlayer?
-    private var cancelSound: AVPlayer?
-    
+    private var listeningSound: AVAudioPlayer?
+    private var successSound: AVAudioPlayer?
+    private var cancelSound: AVAudioPlayer?
     private var rememberedAudioCategory: AVAudioSession.Category?
     private var rememberedAudioCategoryOptions: AVAudioSession.CategoryOptions?
     private var previousLocale: Locale?
@@ -206,8 +200,8 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
         cancelSound = loadSound("assets/sounds/speech_to_text_cancel.m4r")
     }
     
-    fileprivate func loadSound( _ assetPath: String ) -> AVPlayer? {
-        var player: AVPlayer? = nil
+    fileprivate func loadSound( _ assetPath: String ) -> AVAudioPlayer? {
+        var player: AVAudioPlayer? = nil
         let soundKey = registrar.lookupKey(forAsset: assetPath )
         guard !soundKey.isEmpty else {
             return player
@@ -215,8 +209,8 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
         if let soundPath = Bundle.main.path(forResource: soundKey, ofType:nil) {
             let soundUrl = URL(fileURLWithPath: soundPath )
             do {
-                player = try AVPlayer(url: soundUrl )
-//                 player?.delegate = self
+                player = try AVAudioPlayer(contentsOf: soundUrl )
+                player?.delegate = self
             } catch {
                 // no audio
             }
@@ -263,40 +257,12 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
     
     private func stopSpeech( _ result: @escaping FlutterResult) {
         if ( !listening ) {
-            print("stopSpeech-01")
-            if let sound = successSound {
-                sound.seek(to: .zero,completionHandler: {_ in
-                    sound.play()})
-                self.sendBoolResult( false, result );
-            }
+            sendBoolResult( false, result );
             return
         }
         stopAllPlayers()
         self.currentTask?.finish()
         if let sound = successSound {
-            print("stopSpeech-02")
-            sound.seek(to: .zero,completionHandler: {_ in
-                    sound.play()})
-            self.stopCurrentListen( )
-            self.sendBoolResult( true, result )
-        }
-        else {
-            print("stopSpeech-03")
-            stopCurrentListen( )
-            sendBoolResult( true, result );
-        }
-    }
-    
-    private func cancelSpeech( _ result: @escaping FlutterResult) {
-        if ( !listening ) {
-            print("cancelSpeech-01")
-            sendBoolResult( false, result );
-            return
-        }
-        stopAllPlayers()
-        self.currentTask?.cancel()
-        if let sound = cancelSound {
-            print("cancelSpeech-02")
             onPlayEnd = {() -> Void in
                 self.stopCurrentListen( )
                 self.sendBoolResult( true, result )
@@ -305,24 +271,41 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             sound.play()
         }
         else {
-            print("cancelSpeech-03")
+            stopCurrentListen( )
+            sendBoolResult( true, result );
+        }
+    }
+    
+    private func cancelSpeech( _ result: @escaping FlutterResult) {
+        if ( !listening ) {
+            sendBoolResult( false, result );
+            return
+        }
+        stopAllPlayers()
+        self.currentTask?.cancel()
+        if let sound = cancelSound {
+            onPlayEnd = {() -> Void in
+                self.stopCurrentListen( )
+                self.sendBoolResult( true, result )
+                return
+            }
+            sound.play()
+        }
+        else {
             stopCurrentListen( )
             sendBoolResult( true, result );
         }
     }
     
     private func stopAllPlayers() {
-//         cancelSound?.stop()
-//         successSound?.stop()
-//         listeningSound?.stop()
-        cancelSound?.pause()
-        successSound?.pause()
-        listeningSound?.pause()
+        cancelSound?.stop()
+        successSound?.stop()
+        listeningSound?.stop()
     }
     
     private func stopCurrentListen( ) {
         self.currentRequest?.endAudio()
-//         stopAllPlayers()
+        stopAllPlayers()
         do {
             try trap {
                 self.audioEngine.stop()
@@ -340,9 +323,9 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             os_log("Error removing trap: %{PUBLIC}@", log: pluginLog, type: .error, error.localizedDescription)
         }
         do {
-//             if let rememberedAudioCategory = rememberedAudioCategory, let rememberedAudioCategoryOptions = rememberedAudioCategoryOptions {
-//                 try self.audioSession.setCategory(rememberedAudioCategory,options: rememberedAudioCategoryOptions)
-//             }
+            if let rememberedAudioCategory = rememberedAudioCategory, let rememberedAudioCategoryOptions = rememberedAudioCategoryOptions {
+                try self.audioSession.setCategory(rememberedAudioCategory,options: rememberedAudioCategoryOptions)
+            }
         }
         catch {
             os_log("Error stopping listen: %{PUBLIC}@", log: pluginLog, type: .error, error.localizedDescription)
@@ -387,8 +370,6 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             rememberedAudioCategory = self.audioSession.category
             rememberedAudioCategoryOptions = self.audioSession.categoryOptions
             try self.audioSession.setCategory(AVAudioSession.Category.playAndRecord, options: [.defaultToSpeaker,.allowBluetooth,.allowBluetoothA2DP])
-//             try self.audioSession.overrideOutputAudioPort(.speaker)
-
             //            try self.audioSession.setMode(AVAudioSession.Mode.measurement)
             if ( sampleRate > 0 ) {
                 try self.audioSession.setPreferredSampleRate(Double(sampleRate))
@@ -396,14 +377,14 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             try self.audioSession.setMode(AVAudioSession.Mode.default)
             try self.audioSession.setActive(true, options: .notifyOthersOnDeactivation)
             if let sound = listeningSound {
+                self.onPlayEnd = {()->Void in
+                    if ( !self.failedListen ) {
+                        self.listening = true
+                        self.invokeFlutter( SwiftSpeechToTextCallbackMethods.notifyStatus, arguments: SpeechToTextStatus.listening.rawValue )
 
-                sound.seek(to: .zero,completionHandler: {_ in
-                    sound.play()})
-                if ( !self.failedListen ) {
-                    self.listening = true
-                    self.invokeFlutter( SwiftSpeechToTextCallbackMethods.notifyStatus, arguments: SpeechToTextStatus.listening.rawValue )
-
+                    }
                 }
+                sound.play()
             }
             self.audioEngine.reset();
             if(inputNode?.inputFormat(forBus: 0).channelCount == 0){
