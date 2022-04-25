@@ -262,11 +262,12 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             return
         }
         stopAllPlayers()
-        self.currentTask?.finish()
+        
         if let sound = successSound {
             print("stopSpeech-02")
             self.onPlayEnd = {() -> Void in
                 print("successSound end")
+                self.currentTask?.finish()
                 self.stopCurrentListen( )
                 self.sendBoolResult( true, result )
                 return
@@ -275,6 +276,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
         }
         else {
             print("stopSpeech-03")
+            self.currentTask?.finish()
             stopCurrentListen( )
             sendBoolResult( true, result );
         }
