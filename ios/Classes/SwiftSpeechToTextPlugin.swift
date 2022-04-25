@@ -268,7 +268,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
                 self.sendBoolResult( true, result )
                 return
             }
-            sound.play()
+            sound.play(atTime:0)
         }
         else {
             currentTask?.finish()
@@ -290,7 +290,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
                 self.sendBoolResult( true, result )
                 return
             }
-            sound.play()
+            sound.play(atTime:0)
         }
         else {
             currentTask?.cancel()
@@ -386,7 +386,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
 
                     }
                 }
-                sound.play()
+                sound.play(atTime:0)
             }
             self.audioEngine.reset();
             if(inputNode?.inputFormat(forBus: 0).channelCount == 0){
