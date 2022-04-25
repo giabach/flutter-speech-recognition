@@ -210,7 +210,6 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             let soundUrl = URL(fileURLWithPath: soundPath )
             do {
                 player = try AVAudioPlayer(contentsOf: soundUrl )
-                player?.prepareToPlay()
                 player?.delegate = self
             } catch {
                 // no audio
@@ -258,17 +257,13 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
     
     private func stopSpeech( _ result: @escaping FlutterResult) {
         if ( !listening ) {
-            print("stopSpeech-01")
             sendBoolResult( false, result );
             return
         }
         stopAllPlayers()
-        
+        self.currentTask?.finish()
         if let sound = successSound {
-            print("stopSpeech-02")
-            self.onPlayEnd = {() -> Void in
-                print("successSound end")
-                self.currentTask?.finish()
+            onPlayEnd = {() -> Void in
                 self.stopCurrentListen( )
                 self.sendBoolResult( true, result )
                 return
@@ -276,8 +271,6 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             sound.play()
         }
         else {
-            print("stopSpeech-03")
-            self.currentTask?.finish()
             stopCurrentListen( )
             sendBoolResult( true, result );
         }
@@ -312,7 +305,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
     
     private func stopCurrentListen( ) {
         self.currentRequest?.endAudio()
-//         stopAllPlayers()
+        stopAllPlayers()
         do {
             try trap {
                 self.audioEngine.stop()
@@ -330,9 +323,9 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             os_log("Error removing trap: %{PUBLIC}@", log: pluginLog, type: .error, error.localizedDescription)
         }
         do {
-//             if let rememberedAudioCategory = rememberedAudioCategory, let rememberedAudioCategoryOptions = rememberedAudioCategoryOptions {
-//                 try self.audioSession.setCategory(rememberedAudioCategory,options: rememberedAudioCategoryOptions)
-//             }
+            if let rememberedAudioCategory = rememberedAudioCategory, let rememberedAudioCategoryOptions = rememberedAudioCategoryOptions {
+                try self.audioSession.setCategory(rememberedAudioCategory,options: rememberedAudioCategoryOptions)
+            }
         }
         catch {
             os_log("Error stopping listen: %{PUBLIC}@", log: pluginLog, type: .error, error.localizedDescription)
@@ -385,7 +378,6 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             try self.audioSession.setActive(true, options: .notifyOthersOnDeactivation)
             if let sound = listeningSound {
                 self.onPlayEnd = {()->Void in
-                    print("listeningSound end")
                     if ( !self.failedListen ) {
                         self.listening = true
                         self.invokeFlutter( SwiftSpeechToTextCallbackMethods.notifyStatus, arguments: SpeechToTextStatus.listening.rawValue )
@@ -634,12 +626,6 @@ extension SwiftSpeechToTextPlugin : AVAudioPlayerDelegate {
     
     public func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer,
                                             successfully flag: Bool) {
-        if flag {
-            print("audioPlayerDidFinish:true")
-        }else {
-            print("audioPlayerDidFinish:false")
-        }
-        
         if let playEnd = self.onPlayEnd {
             playEnd()
         }
