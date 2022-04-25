@@ -257,13 +257,16 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
     
     private func stopSpeech( _ result: @escaping FlutterResult) {
         if ( !listening ) {
+            print("stopSpeech-01")
             sendBoolResult( false, result );
             return
         }
         stopAllPlayers()
         self.currentTask?.finish()
         if let sound = successSound {
+            print("stopSpeech-02")
             onPlayEnd = {() -> Void in
+                print("successSound end")
                 self.stopCurrentListen( )
                 self.sendBoolResult( true, result )
                 return
@@ -271,6 +274,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             sound.play()
         }
         else {
+            print("stopSpeech-03")
             stopCurrentListen( )
             sendBoolResult( true, result );
         }
@@ -305,7 +309,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
     
     private func stopCurrentListen( ) {
         self.currentRequest?.endAudio()
-        stopAllPlayers()
+//         stopAllPlayers()
         do {
             try trap {
                 self.audioEngine.stop()
@@ -378,6 +382,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
             try self.audioSession.setActive(true, options: .notifyOthersOnDeactivation)
             if let sound = listeningSound {
                 self.onPlayEnd = {()->Void in
+                    print("listeningSound end")
                     if ( !self.failedListen ) {
                         self.listening = true
                         self.invokeFlutter( SwiftSpeechToTextCallbackMethods.notifyStatus, arguments: SpeechToTextStatus.listening.rawValue )
