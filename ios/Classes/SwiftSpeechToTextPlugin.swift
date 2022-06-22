@@ -155,7 +155,7 @@ public class SwiftSpeechToTextPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    private func initialize( _ result: @escaping FlutterResult) {
+    //private func initialize( _ result: @escaping FlutterResult) {
         var success = false
         let status = SFSpeechRecognizer.authorizationStatus()
         switch status {
